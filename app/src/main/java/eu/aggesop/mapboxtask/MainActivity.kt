@@ -5,7 +5,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.mapbox.api.geocoding.v5.models.CarmenFeature
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete
@@ -62,6 +67,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleAutoCompletePlace(data: Intent?) {
         val selectedCarmenFeature = PlaceAutocomplete.getPlace(data)
+        animateCameraToSelectedPlace(selectedCarmenFeature)
+    }
+
+    private fun animateCameraToSelectedPlace(selectedCarmenFeature: CarmenFeature) {
+        mapBoxMap?.animateCamera(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.Builder()
+                    .target(
+                        LatLng(
+                            (selectedCarmenFeature.geometry() as Point).latitude(),
+                            (selectedCarmenFeature.geometry() as Point).longitude()
+                        )
+                    )
+                    .zoom(14.0)
+                    .build()
+            ), 4000
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
